@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DHEV EV Rentals | React App</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --soft: #eef6f1;
+      --ink: #14231d;
+      --muted: #66746e;
+      --line: #d9e2dc;
+      --green: #168b68;
+      --dark: #0c6049;
+      --blue: #2764b4;
+      --yellow: #e5aa22;
+      --red: #ca4e4e;
+      --shadow: 0 18px 45px rgba(20, 35, 29, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    .login {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 480px);
+    }
+
+    .login-visual {
+      display: grid;
+      align-content: end;
+      min-height: 100vh;
+      padding: 8vw 6vw;
+      color: white;
+      background:
+        linear-gradient(90deg, rgba(8, 22, 18, 0.88), rgba(8, 22, 18, 0.38)),
+        url("https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1600&q=85") center/cover;
+    }
+
+    .login-visual h1,
+    .hero h1 {
+      margin: 0;
+      max-width: 800px;
+      font-size: clamp(2.4rem, 7vw, 5.4rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .login-visual p,
+    .hero p {
+      max-width: 650px;
+      margin: 20px 0 0;
+      color: rgba(255,255,255,0.84);
+      font-size: 1.08rem;
+    }
+
+    .login-panel {
+      display: grid;
+      align-content: center;
+      min-height: 100vh;
+      padding: 34px;
+      background: white;
+      box-shadow: -18px 0 50px rgba(20, 35, 29, 0.12);
+    }
+
+    .login-card,
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .login-card h2 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      line-height: 1.05;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: white;
+      border-radius: 8px;
+      background: var(--dark);
+      box-shadow: 0 10px 24px rgba(12, 96, 73, 0.28);
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: white;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(22, 139, 104, 0.13);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 11px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: white;
+      font-weight: 850;
+    }
+
+    .button.primary {
+      color: white;
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    .button.danger {
+      color: white;
+      border-color: var(--red);
+      background: var(--red);
+    }
+
+    .help {
+      padding: 12px;
+      border: 1px solid rgba(22, 139, 104, 0.2);
+      border-radius: 8px;
+      color: var(--dark);
+      background: var(--soft);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 6vw;
+      background: rgba(244, 247, 245, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.94rem;
+    }
+
+    .hero {
+      min-height: 82vh;
+      display: grid;
+      align-items: end;
+      padding: 72px 6vw 42px;
+      color: white;
+      background:
+        linear-gradient(90deg, rgba(8, 22, 18, 0.84), rgba(8, 22, 18, 0.48), rgba(8, 22, 18, 0.12)),
+        url("https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=85") center/cover;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: #a9f2d6;
+      font-size: 0.95rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hero-actions,
+    .card-actions,
+    .inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .metrics,
+    .dashboard,
+    .fleet {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metrics {
+      max-width: 920px;
+      margin-top: 42px;
+    }
+
+    .metric,
+    .dash-card,
+    .fleet-card,
+    .panel,
+    .vehicle-card,
+    .admin-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 10px 30px rgba(20, 35, 29, 0.06);
+    }
+
+    .metric {
+      min-height: 94px;
+      padding: 18px;
+      color: white;
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+    }
+
+    .metric strong,
+    .dash-card strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    section {
+      padding: 68px 6vw;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      width: min(1180px, 100%);
+      margin: 0 auto 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 2.7rem);
+      line-height: 1.04;
+    }
+
+    .section-heading p,
+    .muted {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .panel,
+    .dashboard,
+    .fleet,
+    .admin-grid {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .booking-form {
+      padding: 22px;
+      border-right: 1px solid var(--line);
+      background: var(--soft);
+    }
+
+    .summary {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(22,139,104,0.22);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .summary-row strong { color: var(--ink); }
+
+    .vehicle-area { padding: 22px; }
+
+    .vehicle-toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .vehicle-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .vehicle-card {
+      overflow: hidden;
+    }
+
+    .vehicle-image {
+      position: relative;
+      min-height: 170px;
+      background: #dce9e0 center/cover;
+    }
+
+    .vehicle-body {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .vehicle-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .vehicle-title h3,
+    .fleet-card h3,
+    .admin-panel h3 {
+      margin: 0;
+    }
+
+    .price {
+      color: var(--dark);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .specs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .spec {
+      min-height: 58px;
+      padding: 9px;
+      border-radius: 8px;
+      background: var(--soft);
+    }
+
+    .spec span,
+    .dash-card span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: white;
+      background: var(--green);
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .badge.danger { background: var(--red); }
+    .badge.warn { color: #2b2412; background: var(--yellow); }
+    .vehicle-image .badge { position: absolute; top: 12px; left: 12px; }
+
+    .dash-card,
+    .fleet-card,
+    .admin-panel {
+      padding: 18px;
+    }
+
+    .fleet {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .battery {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dfe7e1;
+      margin: 14px 0;
+    }
+
+    .battery span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .table {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 0.75fr 0.8fr 92px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfb;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .admin-form {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .history {
+      display: grid;
+      gap: 10px;
+    }
+
+    .history-item {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfb;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      width: min(360px, calc(100vw - 36px));
+      padding: 14px 16px;
+      border: 1px solid rgba(22,139,104,0.28);
+      border-radius: 8px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    footer {
+      padding: 28px 6vw 40px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: white;
+    }
+
+    @media (max-width: 1020px) {
+      .login,
+      .booking-grid,
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .login-visual,
+      .login-panel {
+        min-height: auto;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .dashboard,
+      .fleet,
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .vehicle-list,
+      .dashboard,
+      .fleet,
+      .metrics,
+      .specs,
+      .table-row {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useMemo, useState } = React;
+
+    const baseVehicles = [
+      { id: "ev-001", name: "Tata Nexon EV Max", type: "SUV", location: "Coimbatore", range: 453, battery: 88, seats: 5, price: 2400, status: "Available", maintenance: "12 Jul 2026", image: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=900&q=80" },
+      { id: "ev-002", name: "MG ZS EV", type: "Premium SUV", location: "Chennai", range: 461, battery: 76, seats: 5, price: 2800, status: "Available", maintenance: "18 Jul 2026", image: "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=900&q=80" },
+      { id: "ev-003", name: "Ather 450X", type: "Scooter", location: "Bengaluru", range: 150, battery: 94, seats: 2, price: 850, status: "Available", maintenance: "09 Jul 2026", image: "https://images.unsplash.com/photo-1617654112368-307921291f42?auto=format&fit=crop&w=900&q=80" },
+      { id: "ev-004", name: "Hyundai Kona Electric", type: "Crossover", location: "Erode", range: 452, battery: 52, seats: 5, price: 2600, status: "Service Soon", maintenance: "05 Jul 2026", image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80" }
+    ];
+
+    const seedBookings = [
+      { id: "INV-2601", customer: "Arun Kumar", vehicleId: "ev-002", vehicleName: "MG ZS EV", location: "Chennai", pickup: "2026-07-08", drop: "2026-07-10", amount: 5600, payment: "Razorpay", status: "Paid" }
+    ];
+
+    const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+
+    function todayIso() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      return now.toISOString().slice(0, 10);
+    }
+
+    function addDaysIso(dateIso, days) {
+      const date = new Date(dateIso);
+      date.setDate(date.getDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function overlaps(startA, endA, startB, endB) {
+      return startA < endB && startB < endA;
+    }
+
+    function Login({ onLogin }) {
+      const [userId, setUserId] = useState("dhevrentalev");
+      const [password, setPassword] = useState("1234");
+      const [role, setRole] = useState("Admin");
+      const [error, setError] = useState("");
+
+      function submit(event) {
+        event.preventDefault();
+        if (userId !== "dhevrentalev" || password !== "1234") {
+          setError("Use user ID dhevrentalev and password 1234.");
+          return;
+        }
+        onLogin({ userId, role });
+      }
+
+      return (
+        <section className="login">
+          <div className="login-visual">
+            <div>
+              <p className="eyebrow">DHEV EV Rentals</p>
+              <h1>Login to manage EV bookings and fleet operations.</h1>
+              <p>React.js version with login, booking, availability checks, fare calculation, admin dashboard, cancellations, and fleet monitoring.</p>
+            </div>
+          </div>
+          <div className="login-panel">
+            <form className="login-card" onSubmit={submit}>
+              <div className="brand"><span className="brand-mark">EV</span><span>DHEV Rentals</span></div>
+              <div>
+                <h2>Welcome back</h2>
+                <p className="muted">Enter your user ID and password to open the website.</p>
+              </div>
+              <div className="field">
+                <label>User ID</label>
+                <input value={userId} onChange={(e) => setUserId(e.target.value)} />
+              </div>
+              <div className="field">
+                <label>Password</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              </div>
+              <div className="field">
+                <label>Role</label>
+                <select value={role} onChange={(e) => setRole(e.target.value)}>
+                  <option>Admin</option>
+                  <option>Customer</option>
+                </select>
+              </div>
+              <button className="button primary">Login and Open Website</button>
+              <div className="help">User ID: dhevrentalev | Password: 1234</div>
+              {error && <div className="help">{error}</div>}
+            </form>
+          </div>
+        </section>
+      );
+    }
+
+    function App() {
+      const [session, setSession] = useState(null);
+      const [vehicles, setVehicles] = useState(() => {
+        return [...baseVehicles, ...JSON.parse(localStorage.getItem("reactDhevVehicles") || "[]")];
+      });
+      const [bookings, setBookings] = useState(() => JSON.parse(localStorage.getItem("reactDhevBookings") || "null") || seedBookings);
+      const [toast, setToast] = useState(null);
+      const [selectedId, setSelectedId] = useState(null);
+      const [form, setForm] = useState({
+        customer: "Dhev Pragathish",
+        location: "All",
+        pickup: todayIso(),
+        drop: addDaysIso(todayIso(), 2),
+        type: "All",
+        sort: "price",
+        search: "",
+        payment: "Razorpay",
+        coupon: ""
+      });
+      const [newVehicle, setNewVehicle] = useState({ name: "", type: "SUV", location: "Coimbatore", range: 375, price: 2200 });
+
+      function notify(title, message) {
+        setToast({ title, message });
+        window.clearTimeout(notify.timer);
+        notify.timer = window.setTimeout(() => setToast(null), 3400);
+      }
+
+      function updateForm(key, value) {
+        setForm((current) => {
+          const next = { ...current, [key]: value };
+          if (key === "pickup" && next.drop <= value) next.drop = addDaysIso(value, 1);
+          return next;
+        });
+      }
+
+      function rentalDays() {
+        return Math.max(Math.ceil((new Date(form.drop) - new Date(form.pickup)) / 86400000), 1);
+      }
+
+      function isAvailable(vehicleId) {
+        return !bookings.some((booking) => booking.vehicleId === vehicleId && booking.status !== "Cancelled" && overlaps(form.pickup, form.drop, booking.pickup, booking.drop));
+      }
+
+      function discountRate() {
+        const code = form.coupon.trim().toUpperCase();
+        if (code === "GREEN10") return 0.1;
+        if (code === "EV20") return 0.2;
+        return 0;
+      }
+
+      function fare(vehicle) {
+        if (!vehicle) return { subtotal: 0, discount: 0, total: 0 };
+        const subtotal = vehicle.price * rentalDays();
+        const discount = Math.round(subtotal * discountRate());
+        return { subtotal, discount, total: subtotal - discount };
+      }
+
+      const selectedVehicle = vehicles.find((vehicle) => vehicle.id === selectedId);
+      const currentFare = fare(selectedVehicle);
+
+      const filteredVehicles = useMemo(() => {
+        const query = form.search.trim().toLowerCase();
+        return vehicles.filter((vehicle) => {
+          const location = form.location === "All" || vehicle.location === form.location;
+          const type = form.type === "All" || vehicle.type === form.type;
+          const search = !query || [vehicle.name, vehicle.type, vehicle.location].join(" ").toLowerCase().includes(query);
+          return location && type && search;
+        }).sort((a, b) => {
+          if (form.sort === "range") return b.range - a.range;
+          if (form.sort === "battery") return b.battery - a.battery;
+          return a.price - b.price;
+        });
+      }, [vehicles, form]);
+
+      const activeBookings = bookings.filter((booking) => booking.status !== "Cancelled");
+      const revenue = activeBookings.reduce((sum, booking) => sum + booking.amount, 0);
+      const utilization = Math.round((new Set(activeBookings.map((booking) => booking.vehicleId)).size / vehicles.length) * 100);
+
+      function confirmBooking() {
+        if (!selectedVehicle) {
+          notify("Select an EV", "Choose an available vehicle before booking.");
+          return;
+        }
+        if (!isAvailable(selectedVehicle.id)) {
+          notify("Booking blocked", "This EV is already reserved for those dates.");
+          return;
+        }
+        const booking = {
+          id: "INV-" + Math.floor(2600 + Math.random() * 7000),
+          customer: form.customer || "Guest Customer",
+          vehicleId: selectedVehicle.id,
+          vehicleName: selectedVehicle.name,
+          location: selectedVehicle.location,
+          pickup: form.pickup,
+          drop: form.drop,
+          amount: currentFare.total,
+          payment: form.payment,
+          status: form.payment === "Pay at pickup" ? "Pending" : "Paid"
+        };
+        const nextBookings = [...bookings, booking];
+        setBookings(nextBookings);
+        localStorage.setItem("reactDhevBookings", JSON.stringify(nextBookings));
+        setSelectedId(null);
+        notify("Booking confirmed", booking.id + " created successfully.");
+      }
+
+      function cancelBooking(id) {
+        const nextBookings = bookings.map((booking) => booking.id === id ? { ...booking, status: "Cancelled" } : booking);
+        setBookings(nextBookings);
+        localStorage.setItem("reactDhevBookings", JSON.stringify(nextBookings));
+        notify("Booking cancelled", id + " is cancelled and vehicle availability is updated.");
+      }
+
+      function addVehicle(event) {
+        event.preventDefault();
+        const vehicle = {
+          id: "custom-" + Date.now(),
+          name: newVehicle.name || "New EV",
+          type: newVehicle.type || "SUV",
+          location: newVehicle.location || "Coimbatore",
+          range: Number(newVehicle.range),
+          battery: 100,
+          seats: 5,
+          price: Number(newVehicle.price),
+          status: "Available",
+          maintenance: "Schedule pending",
+          image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=900&q=80"
+        };
+        const nextVehicles = [...vehicles, vehicle];
+        setVehicles(nextVehicles);
+        localStorage.setItem("reactDhevVehicles", JSON.stringify(nextVehicles.filter((item) => item.id.startsWith("custom-"))));
+        setNewVehicle({ name: "", type: "SUV", location: "Coimbatore", range: 375, price: 2200 });
+        notify("Vehicle added", vehicle.name + " is now available in the fleet.");
+      }
+
+      if (!session) return <Login onLogin={setSession} />;
+
+      return (
+        <>
+          <nav className="topbar">
+            <a className="brand" href="#home"><span className="brand-mark">EV</span><span>DHEV Rentals React</span></a>
+            <div className="nav-links">
+              <a href="#booking">Book EV</a>
+              <a href="#fleet">Fleet</a>
+              <a href="#dashboard">Admin</a>
+              <button className="button" onClick={() => setSession(null)}>Logout</button>
+            </div>
+          </nav>
+
+          <header className="hero" id="home">
+            <div>
+              <p className="eyebrow">React.js EV rental platform</p>
+              <h1>Rent clean mobility with instant booking control.</h1>
+              <p>Search EVs, compare fares, confirm bookings, prevent double booking, monitor revenue, and manage fleet records.</p>
+              <div className="hero-actions">
+                <a className="button primary" href="#booking">Start Booking</a>
+                <a className="button" href="#dashboard">View Dashboard</a>
+              </div>
+              <div className="metrics">
+                <div className="metric"><strong>24/7</strong><span>Online reservations</span></div>
+                <div className="metric"><strong>{vehicles.length}</strong><span>Active EVs</span></div>
+                <div className="metric"><strong>{bookings.length}</strong><span>Total bookings</span></div>
+                <div className="metric"><strong>{session.role}</strong><span>Current role</span></div>
+              </div>
+            </div>
+          </header>
+
+          <section id="booking">
+            <div className="section-heading">
+              <h2>EV Booking</h2>
+              <p>Choose filters, dates, payment, and coupon before confirming a booking.</p>
+            </div>
+            <div className="panel booking-grid">
+              <aside className="booking-form">
+                <div className="form-grid">
+                  <div className="field"><label>Customer name</label><input value={form.customer} onChange={(e) => updateForm("customer", e.target.value)} /></div>
+                  <div className="field"><label>Pickup location</label><select value={form.location} onChange={(e) => updateForm("location", e.target.value)}><option>All</option><option>Coimbatore</option><option>Chennai</option><option>Bengaluru</option><option>Erode</option></select></div>
+                  <div className="field"><label>Pickup date</label><input type="date" min={todayIso()} value={form.pickup} onChange={(e) => updateForm("pickup", e.target.value)} /></div>
+                  <div className="field"><label>Return date</label><input type="date" min={addDaysIso(form.pickup, 1)} value={form.drop} onChange={(e) => updateForm("drop", e.target.value)} /></div>
+                  <div className="field"><label>Vehicle type</label><select value={form.type} onChange={(e) => updateForm("type", e.target.value)}><option>All</option><option>SUV</option><option>Premium SUV</option><option>Scooter</option><option>Crossover</option></select></div>
+                  <div className="field"><label>Search EV</label><input value={form.search} onChange={(e) => updateForm("search", e.target.value)} placeholder="Model, city, or type" /></div>
+                  <div className="field"><label>Sort by</label><select value={form.sort} onChange={(e) => updateForm("sort", e.target.value)}><option value="price">Lowest fare</option><option value="range">Highest range</option><option value="battery">Highest battery</option></select></div>
+                  <div className="field"><label>Payment method</label><select value={form.payment} onChange={(e) => updateForm("payment", e.target.value)}><option>Razorpay</option><option>Stripe</option><option>UPI</option><option>Pay at pickup</option></select></div>
+                  <div className="field"><label>Coupon</label><input value={form.coupon} onChange={(e) => updateForm("coupon", e.target.value)} placeholder="GREEN10 or EV20" /></div>
+                </div>
+                <div className="summary">
+                  <div className="summary-row"><span>Selected EV</span><strong>{selectedVehicle ? selectedVehicle.name : "None"}</strong></div>
+                  <div className="summary-row"><span>Rental days</span><strong>{rentalDays()}</strong></div>
+                  <div className="summary-row"><span>Payment</span><strong>{form.payment}</strong></div>
+                  <div className="summary-row"><span>Discount</span><strong>{currency.format(currentFare.discount)}</strong></div>
+                  <div className="summary-row"><span>Total fare</span><strong>{currency.format(currentFare.total)}</strong></div>
+                  <button className="button primary" onClick={confirmBooking}>Confirm Booking</button>
+                </div>
+              </aside>
+
+              <div className="vehicle-area">
+                <div className="vehicle-toolbar">
+                  <strong>{filteredVehicles.length} EVs found</strong>
+                  <span className="badge">Double booking check active</span>
+                </div>
+                <div className="vehicle-list">
+                  {filteredVehicles.map((vehicle) => {
+                    const available = isAvailable(vehicle.id);
+                    return (
+                      <article className="vehicle-card" key={vehicle.id}>
+                        <div className="vehicle-image" style={{ backgroundImage: `url(${vehicle.image})` }}><span className={"badge " + (available ? "" : "danger")}>{available ? vehicle.status : "Booked"}</span></div>
+                        <div className="vehicle-body">
+                          <div className="vehicle-title"><div><h3>{vehicle.name}</h3><span className="muted">{vehicle.type} | {vehicle.location}</span></div><div className="price">{currency.format(vehicle.price)}/day</div></div>
+                          <div className="specs">
+                            <div className="spec"><strong>{vehicle.range} km</strong><span>Range</span></div>
+                            <div className="spec"><strong>{vehicle.battery}%</strong><span>Battery</span></div>
+                            <div className="spec"><strong>{vehicle.seats}</strong><span>Seats</span></div>
+                          </div>
+                          <div className="card-actions">
+                            <button className="button primary" disabled={!available} onClick={() => setSelectedId(vehicle.id)}>Select EV</button>
+                            <button className="button" onClick={() => notify("Invoice preview", vehicle.name + " estimate is " + currency.format(fare(vehicle).total) + ".")}>Invoice</button>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="fleet">
+            <div className="section-heading"><h2>Fleet Management</h2><p>Battery, service schedule, range, and current booking status.</p></div>
+            <div className="fleet">
+              {vehicles.map((vehicle) => (
+                <article className="fleet-card" key={vehicle.id}>
+                  <h3>{vehicle.name}</h3>
+                  <p className="muted">{vehicle.location} | {vehicle.type}</p>
+                  <div className="battery"><span style={{ width: vehicle.battery + "%" }}></span></div>
+                  <p className="muted">Battery: {vehicle.battery}% | Range: {vehicle.range} km | Service: {vehicle.maintenance}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section id="dashboard">
+            <div className="section-heading"><h2>Admin Dashboard</h2><p>Bookings, revenue, utilization, cancellations, and new fleet entry.</p></div>
+            <div className="dashboard">
+              <div className="dash-card"><span>Total revenue</span><strong>{currency.format(revenue)}</strong></div>
+              <div className="dash-card"><span>Active bookings</span><strong>{activeBookings.length}</strong></div>
+              <div className="dash-card"><span>Fleet utilization</span><strong>{utilization}%</strong></div>
+              <div className="dash-card"><span>Registered users</span><strong>184</strong></div>
+            </div>
+            <div className="admin-grid">
+              <div className="admin-panel">
+                <h3>Booking Records</h3>
+                <div className="table">
+                  {bookings.map((booking) => (
+                    <div className="table-row" key={booking.id}>
+                      <strong>{booking.id}</strong>
+                      <span>{booking.vehicleName}</span>
+                      <span>{currency.format(booking.amount)}</span>
+                      <span className={"badge " + (booking.status === "Cancelled" ? "danger" : "")}>{booking.status}</span>
+                      <button className="button danger" disabled={booking.status === "Cancelled"} onClick={() => cancelBooking(booking.id)}>Cancel</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="admin-panel">
+                <h3>Add EV</h3>
+                <form className="admin-form" onSubmit={addVehicle}>
+                  <div className="field"><label>Vehicle name</label><input value={newVehicle.name} onChange={(e) => setNewVehicle({ ...newVehicle, name: e.target.value })} placeholder="Mahindra XUV400 EV" /></div>
+                  <div className="field"><label>Type</label><input value={newVehicle.type} onChange={(e) => setNewVehicle({ ...newVehicle, type: e.target.value })} /></div>
+                  <div className="field"><label>Location</label><input value={newVehicle.location} onChange={(e) => setNewVehicle({ ...newVehicle, location: e.target.value })} /></div>
+                  <div className="field"><label>Range km</label><input type="number" value={newVehicle.range} onChange={(e) => setNewVehicle({ ...newVehicle, range: e.target.value })} /></div>
+                  <div className="field"><label>Fare / day</label><input type="number" value={newVehicle.price} onChange={(e) => setNewVehicle({ ...newVehicle, price: e.target.value })} /></div>
+                  <button className="button primary">Add Vehicle</button>
+                </form>
+                <h3>Booking History</h3>
+                <div className="history">
+                  {bookings.slice().reverse().map((booking) => (
+                    <div className="history-item" key={booking.id}><strong>{booking.customer}</strong><div className="muted">{booking.vehicleName} | {booking.pickup} to {booking.drop} | {booking.payment} | {booking.status}</div></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <footer>DHEV EV Rental and Booking Management Platform | React.js version | User ID: dhevrentalev | Password: 1234</footer>
+          {toast && <div className="toast"><strong>{toast.title}</strong><div className="muted">{toast.message}</div></div>}
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

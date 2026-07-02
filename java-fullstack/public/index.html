@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DHEV EV Rentals | Java Full Stack</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --soft: #eef6f1;
+      --ink: #14231d;
+      --muted: #66746e;
+      --line: #d9e2dc;
+      --green: #168b68;
+      --dark: #0c6049;
+      --blue: #2764b4;
+      --red: #ca4e4e;
+      --shadow: 0 18px 45px rgba(20, 35, 29, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    .hidden { display: none !important; }
+
+    .login {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 480px);
+    }
+
+    .login-visual {
+      display: grid;
+      align-content: end;
+      min-height: 100vh;
+      padding: 8vw 6vw;
+      color: white;
+      background:
+        linear-gradient(90deg, rgba(8, 22, 18, 0.88), rgba(8, 22, 18, 0.38)),
+        url("https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1600&q=85") center/cover;
+    }
+
+    .login-visual h1,
+    .hero h1 {
+      margin: 0;
+      max-width: 800px;
+      font-size: clamp(2.35rem, 7vw, 5.25rem);
+      line-height: 0.98;
+    }
+
+    .login-visual p,
+    .hero p {
+      max-width: 650px;
+      margin: 20px 0 0;
+      color: rgba(255,255,255,0.84);
+      font-size: 1.08rem;
+    }
+
+    .login-panel {
+      display: grid;
+      align-content: center;
+      min-height: 100vh;
+      padding: 34px;
+      background: white;
+      box-shadow: -18px 0 50px rgba(20, 35, 29, 0.12);
+    }
+
+    .login-card,
+    .form-grid,
+    .admin-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: white;
+      border-radius: 8px;
+      background: var(--dark);
+      box-shadow: 0 10px 24px rgba(12, 96, 73, 0.28);
+    }
+
+    .field { display: grid; gap: 7px; }
+    label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: white;
+      outline: none;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 11px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: white;
+      font-weight: 850;
+    }
+
+    .button.primary {
+      color: white;
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    .button.danger {
+      color: white;
+      border-color: var(--red);
+      background: var(--red);
+    }
+
+    .help {
+      padding: 12px;
+      border: 1px solid rgba(22, 139, 104, 0.2);
+      border-radius: 8px;
+      color: var(--dark);
+      background: var(--soft);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 6vw;
+      background: rgba(244, 247, 245, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.94rem;
+    }
+
+    .hero {
+      min-height: 78vh;
+      display: grid;
+      align-items: end;
+      padding: 72px 6vw 42px;
+      color: white;
+      background:
+        linear-gradient(90deg, rgba(8, 22, 18, 0.84), rgba(8, 22, 18, 0.48), rgba(8, 22, 18, 0.12)),
+        url("https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=85") center/cover;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: #a9f2d6;
+      font-size: 0.95rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .hero-actions,
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .metrics,
+    .dashboard,
+    .fleet {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metrics {
+      max-width: 920px;
+      margin-top: 42px;
+    }
+
+    .metric,
+    .dash-card,
+    .fleet-card,
+    .panel,
+    .vehicle-card,
+    .admin-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 10px 30px rgba(20, 35, 29, 0.06);
+    }
+
+    .metric {
+      min-height: 94px;
+      padding: 18px;
+      color: white;
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+    }
+
+    .metric strong,
+    .dash-card strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    section { padding: 68px 6vw; }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      width: min(1180px, 100%);
+      margin: 0 auto 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 2.7rem);
+      line-height: 1.04;
+    }
+
+    .muted,
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .panel,
+    .dashboard,
+    .fleet,
+    .admin-grid {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .booking-form {
+      padding: 22px;
+      border-right: 1px solid var(--line);
+      background: var(--soft);
+    }
+
+    .summary {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(22,139,104,0.22);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .vehicle-area { padding: 22px; }
+
+    .vehicle-toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .vehicle-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .vehicle-card { overflow: hidden; }
+
+    .vehicle-image {
+      position: relative;
+      min-height: 170px;
+      background: #dce9e0 center/cover;
+    }
+
+    .vehicle-body {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .vehicle-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .vehicle-title h3,
+    .fleet-card h3,
+    .admin-panel h3 {
+      margin: 0;
+    }
+
+    .price {
+      color: var(--dark);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .specs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .spec {
+      min-height: 58px;
+      padding: 9px;
+      border-radius: 8px;
+      background: var(--soft);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: white;
+      background: var(--green);
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .badge.danger { background: var(--red); }
+    .vehicle-image .badge { position: absolute; top: 12px; left: 12px; }
+
+    .dash-card,
+    .fleet-card,
+    .admin-panel {
+      padding: 18px;
+    }
+
+    .fleet { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .battery {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dfe7e1;
+      margin: 14px 0;
+    }
+
+    .battery span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .table,
+    .history {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 0.75fr 0.8fr 92px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfb;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .history-item {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfb;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      width: min(360px, calc(100vw - 36px));
+      padding: 14px 16px;
+      border: 1px solid rgba(22,139,104,0.28);
+      border-radius: 8px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    footer {
+      padding: 28px 6vw 40px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: white;
+    }
+
+    @media (max-width: 1020px) {
+      .login,
+      .booking-grid,
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .login-visual,
+      .login-panel {
+        min-height: auto;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .dashboard,
+      .fleet,
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .vehicle-list,
+      .dashboard,
+      .fleet,
+      .metrics,
+      .specs,
+      .table-row {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="login" id="loginPage">
+    <div class="login-visual">
+      <div>
+        <p class="eyebrow">DHEV EV Rentals</p>
+        <h1>Java backend EV rental platform.</h1>
+        <p>Login, book EVs, prevent double bookings, manage fleet data, cancel reservations, and monitor revenue through Java API endpoints.</p>
+      </div>
+    </div>
+    <div class="login-panel">
+      <form class="login-card" id="loginForm">
+        <div class="brand"><span class="brand-mark">EV</span><span>DHEV Rentals</span></div>
+        <div>
+          <h2>Welcome back</h2>
+          <p class="muted">Enter your user ID and password to open the Java full-stack website.</p>
+        </div>
+        <div class="field">
+          <label for="userId">User ID</label>
+          <input id="userId" value="dhevrentalev" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" value="1234" required>
+        </div>
+        <button class="button primary" type="submit">Login and Open Website</button>
+        <div class="help">User ID: dhevrentalev | Password: 1234</div>
+      </form>
+    </div>
+  </section>
+
+  <div id="app" class="hidden">
+    <nav class="topbar">
+      <a class="brand" href="#home"><span class="brand-mark">EV</span><span>DHEV Rentals Java</span></a>
+      <div class="nav-links">
+        <a href="#booking">Book EV</a>
+        <a href="#fleet">Fleet</a>
+        <a href="#dashboard">Admin</a>
+        <button class="button" id="logoutButton">Logout</button>
+      </div>
+    </nav>
+
+    <header class="hero" id="home">
+      <div>
+        <p class="eyebrow">Java full-stack EV rental platform</p>
+        <h1>Rent clean mobility with backend booking control.</h1>
+        <p>Frontend screens talk to Java API endpoints for login, vehicle inventory, booking confirmation, cancellation, and admin fleet updates.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#booking">Start Booking</a>
+          <a class="button" href="#dashboard">View Dashboard</a>
+        </div>
+        <div class="metrics">
+          <div class="metric"><strong>Java</strong><span>Backend API</span></div>
+          <div class="metric"><strong id="metricVehicles">0</strong><span>Active EVs</span></div>
+          <div class="metric"><strong id="metricBookings">0</strong><span>Total bookings</span></div>
+          <div class="metric"><strong>8080</strong><span>Server port</span></div>
+        </div>
+      </div>
+    </header>
+
+    <section id="booking">
+      <div class="section-heading">
+        <h2>EV Booking</h2>
+        <p>Filter EVs, calculate fares, apply coupons, and confirm bookings through the Java backend.</p>
+      </div>
+      <div class="panel booking-grid">
+        <aside class="booking-form">
+          <div class="form-grid">
+            <div class="field"><label for="customerName">Customer name</label><input id="customerName" value="Dhev Pragathish"></div>
+            <div class="field"><label for="location">Pickup location</label><select id="location"><option>All</option><option>Coimbatore</option><option>Chennai</option><option>Bengaluru</option><option>Erode</option></select></div>
+            <div class="field"><label for="pickupDate">Pickup date</label><input id="pickupDate" type="date"></div>
+            <div class="field"><label for="returnDate">Return date</label><input id="returnDate" type="date"></div>
+            <div class="field"><label for="vehicleType">Vehicle type</label><select id="vehicleType"><option>All</option><option>SUV</option><option>Premium SUV</option><option>Scooter</option><option>Crossover</option></select></div>
+            <div class="field"><label for="searchVehicle">Search EV</label><input id="searchVehicle" placeholder="Model, city, or type"></div>
+            <div class="field"><label for="paymentMethod">Payment method</label><select id="paymentMethod"><option>Razorpay</option><option>Stripe</option><option>UPI</option><option>Pay at pickup</option></select></div>
+            <div class="field"><label for="couponCode">Coupon</label><input id="couponCode" placeholder="GREEN10 or EV20"></div>
+          </div>
+          <div class="summary">
+            <div class="summary-row"><span>Selected EV</span><strong id="selectedVehicle">None</strong></div>
+            <div class="summary-row"><span>Rental days</span><strong id="rentalDays">1</strong></div>
+            <div class="summary-row"><span>Discount</span><strong id="discountAmount">Rs. 0</strong></div>
+            <div class="summary-row"><span>Total fare</span><strong id="totalFare">Rs. 0</strong></div>
+            <button class="button primary" id="confirmBooking">Confirm Booking</button>
+          </div>
+        </aside>
+        <div class="vehicle-area">
+          <div class="vehicle-toolbar">
+            <strong id="availabilityText">Loading EVs</strong>
+            <span class="badge">Double booking check active</span>
+          </div>
+          <div class="vehicle-list" id="vehicleList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fleet">
+      <div class="section-heading"><h2>Fleet Management</h2><p>Battery, service schedule, range, and current booking status.</p></div>
+      <div class="fleet" id="fleetGrid"></div>
+    </section>
+
+    <section id="dashboard">
+      <div class="section-heading"><h2>Admin Dashboard</h2><p>Bookings, revenue, utilization, cancellations, and new fleet entry.</p></div>
+      <div class="dashboard">
+        <div class="dash-card"><span>Total revenue</span><strong id="dashRevenue">Rs. 0</strong></div>
+        <div class="dash-card"><span>Active bookings</span><strong id="dashBookings">0</strong></div>
+        <div class="dash-card"><span>Fleet utilization</span><strong id="dashUtilization">0%</strong></div>
+        <div class="dash-card"><span>Registered users</span><strong>184</strong></div>
+      </div>
+      <div class="admin-grid">
+        <div class="admin-panel">
+          <h3>Booking Records</h3>
+          <div class="table" id="bookingTable"></div>
+        </div>
+        <div class="admin-panel">
+          <h3>Add EV</h3>
+          <form class="admin-form" id="addVehicleForm">
+            <div class="field"><label for="newVehicleName">Vehicle name</label><input id="newVehicleName" placeholder="Mahindra XUV400 EV" required></div>
+            <div class="field"><label for="newVehicleType">Type</label><input id="newVehicleType" value="SUV" required></div>
+            <div class="field"><label for="newVehicleLocation">Location</label><input id="newVehicleLocation" value="Coimbatore" required></div>
+            <div class="field"><label for="newVehicleRange">Range km</label><input id="newVehicleRange" type="number" value="375" required></div>
+            <div class="field"><label for="newVehiclePrice">Fare / day</label><input id="newVehiclePrice" type="number" value="2200" required></div>
+            <button class="button primary">Add Vehicle</button>
+          </form>
+          <h3>Booking History</h3>
+          <div class="history" id="bookingHistory"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>DHEV EV Rental and Booking Management Platform | Java backend + HTML CSS JS frontend</footer>
+  </div>
+
+  <div class="toast hidden" id="toast"><strong id="toastTitle"></strong><div class="muted" id="toastMessage"></div></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

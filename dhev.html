@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DHEV EV Rentals | Booking Management Platform</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --surface-2: #eef6f1;
+      --ink: #14231d;
+      --muted: #66746e;
+      --line: #d9e2dc;
+      --green: #168b68;
+      --green-dark: #0c6049;
+      --blue: #2764b4;
+      --yellow: #e5aa22;
+      --red: #ca4e4e;
+      --shadow: 0 18px 45px rgba(20, 35, 29, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body.login-active .app-shell {
+      display: none;
+    }
+
+    .login-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 480px);
+      background: var(--bg);
+    }
+
+    body:not(.login-active) .login-page {
+      display: none;
+    }
+
+    .login-visual {
+      display: grid;
+      align-content: end;
+      min-height: 100vh;
+      padding: 8vw 6vw;
+      color: white;
+      background:
+        linear-gradient(90deg, rgba(8, 22, 18, 0.86), rgba(8, 22, 18, 0.38)),
+        url("https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=1600&q=85") center/cover;
+    }
+
+    .login-visual h1 {
+      max-width: 760px;
+      font-size: clamp(2.4rem, 6vw, 5rem);
+    }
+
+    .login-visual p {
+      max-width: 620px;
+      margin: 20px 0 0;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 1.08rem;
+    }
+
+    .login-panel {
+      display: grid;
+      align-content: center;
+      min-height: 100vh;
+      padding: 34px;
+      background: white;
+      box-shadow: -18px 0 50px rgba(20, 35, 29, 0.12);
+    }
+
+    .login-card {
+      display: grid;
+      gap: 18px;
+    }
+
+    .login-card h2 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      line-height: 1.05;
+    }
+
+    .login-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .login-help {
+      padding: 12px;
+      border: 1px solid rgba(22, 139, 104, 0.2);
+      border-radius: 8px;
+      color: var(--green-dark);
+      background: var(--surface-2);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 16px 6vw;
+      background: rgba(244, 247, 245, 0.93);
+      border-bottom: 1px solid rgba(217, 226, 220, 0.85);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: white;
+      border-radius: 8px;
+      background: var(--green-dark);
+      box-shadow: 0 10px 24px rgba(12, 96, 73, 0.28);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover {
+      color: var(--green-dark);
+    }
+
+    .nav-button {
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--green-dark);
+      background: white;
+      font-weight: 850;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 86vh;
+      display: grid;
+      align-items: end;
+      padding: 74px 6vw 42px;
+      color: white;
+      background:
+        linear-gradient(90deg, rgba(8, 22, 18, 0.84), rgba(8, 22, 18, 0.52) 48%, rgba(8, 22, 18, 0.14)),
+        url("https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1800&q=85") center/cover;
+    }
+
+    .hero-inner {
+      width: min(1180px, 100%);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: #a9f2d6;
+      font-size: 0.95rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      max-width: 820px;
+      margin: 0;
+      font-size: clamp(2.45rem, 7vw, 5.6rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 660px;
+      margin: 20px 0 0;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 1.1rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 12px 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--surface);
+      font-weight: 850;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px rgba(20, 35, 29, 0.13);
+    }
+
+    .button.primary {
+      color: white;
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    .button.primary:hover {
+      background: var(--green-dark);
+    }
+
+    .button.danger {
+      color: white;
+      border-color: var(--red);
+      background: var(--red);
+    }
+
+    .button.dark {
+      color: white;
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 920px;
+      margin-top: 46px;
+    }
+
+    .metric {
+      min-height: 96px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.75rem;
+      line-height: 1;
+    }
+
+    .metric span {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.9rem;
+    }
+
+    section {
+      padding: 68px 6vw;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      width: min(1180px, 100%);
+      margin: 0 auto 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 3vw, 2.7rem);
+      line-height: 1.04;
+    }
+
+    .section-heading p {
+      max-width: 520px;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .panel {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 12px 34px rgba(20, 35, 29, 0.07);
+    }
+
+    .booking-grid {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 0;
+      overflow: hidden;
+    }
+
+    .booking-form {
+      padding: 22px;
+      border-right: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .inline-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .muted-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: white;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(22, 139, 104, 0.13);
+    }
+
+    .summary {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(22, 139, 104, 0.22);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .summary-row strong {
+      color: var(--ink);
+    }
+
+    .summary-total {
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+      font-size: 1.15rem;
+    }
+
+    .vehicle-area {
+      padding: 22px;
+    }
+
+    .vehicle-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .vehicle-toolbar p {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .vehicle-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .vehicle-card {
+      display: grid;
+      grid-template-rows: 170px 1fr;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .vehicle-image {
+      position: relative;
+      background: #dce9e0 center/cover;
+    }
+
+    .vehicle-card:nth-child(1) .vehicle-image {
+      background-image: url("https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .vehicle-card:nth-child(2) .vehicle-image {
+      background-image: url("https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .vehicle-card:nth-child(3) .vehicle-image {
+      background-image: url("https://images.unsplash.com/photo-1617654112368-307921291f42?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .vehicle-card:nth-child(4) .vehicle-image {
+      background-image: url("https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: white;
+      background: var(--green);
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .badge.warn {
+      background: var(--yellow);
+      color: #2b2412;
+    }
+
+    .badge.danger {
+      background: var(--red);
+    }
+
+    .vehicle-image .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+    }
+
+    .vehicle-body {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .vehicle-title {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .vehicle-title h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .price {
+      color: var(--green-dark);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .specs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .spec {
+      min-height: 58px;
+      padding: 9px;
+      border-radius: 8px;
+      background: var(--surface-2);
+    }
+
+    .spec strong {
+      display: block;
+      font-size: 0.95rem;
+    }
+
+    .spec span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .card-actions .button {
+      flex: 1;
+      min-height: 42px;
+      padding: 10px 12px;
+    }
+
+    .button[disabled] {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      width: min(1180px, 100%);
+      margin: 0 auto 16px;
+    }
+
+    .dash-card {
+      min-height: 120px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 10px 30px rgba(20, 35, 29, 0.06);
+    }
+
+    .dash-card span {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .dash-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .dash-card small {
+      display: block;
+      margin-top: 9px;
+      color: var(--green-dark);
+      font-weight: 800;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+      gap: 16px;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .admin-panel {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 10px 30px rgba(20, 35, 29, 0.06);
+    }
+
+    .admin-panel h3 {
+      margin: 0 0 14px;
+    }
+
+    .admin-form {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .table {
+      display: grid;
+      gap: 8px;
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr 0.7fr 0.7fr 94px;
+      gap: 10px;
+      align-items: center;
+      min-height: 48px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfb;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .table-row strong {
+      color: var(--ink);
+    }
+
+    .booking-history {
+      display: grid;
+      gap: 10px;
+    }
+
+    .booking-item {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfdfb;
+    }
+
+    .booking-item strong {
+      display: block;
+    }
+
+    .booking-item span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .fleet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .fleet-card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 10px 30px rgba(20, 35, 29, 0.06);
+    }
+
+    .fleet-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .fleet-head h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .battery {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dfe7e1;
+    }
+
+    .battery span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+    }
+
+    .fleet-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .auth-section {
+      background: #eaf1f6;
+    }
+
+    .auth-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+      gap: 18px;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .auth-copy {
+      display: grid;
+      align-content: center;
+      min-height: 320px;
+      padding: 28px;
+      color: white;
+      border-radius: 8px;
+      background:
+        linear-gradient(rgba(12, 32, 41, 0.72), rgba(12, 32, 41, 0.72)),
+        url("https://images.unsplash.com/photo-1570733577524-3a047079e80d?auto=format&fit=crop&w=1000&q=80") center/cover;
+    }
+
+    .auth-copy h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      line-height: 1.05;
+    }
+
+    .auth-copy p {
+      max-width: 480px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .auth-card {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 30;
+      width: min(360px, calc(100vw - 36px));
+      padding: 14px 16px;
+      border: 1px solid rgba(22, 139, 104, 0.28);
+      border-radius: 8px;
+      background: white;
+      box-shadow: var(--shadow);
+      transform: translateY(140%);
+      opacity: 0;
+      transition: transform 220ms ease, opacity 220ms ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast strong {
+      display: block;
+    }
+
+    .toast span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    footer {
+      padding: 28px 6vw 40px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      background: white;
+    }
+
+    footer div {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1020px) {
+      .login-page {
+        grid-template-columns: 1fr;
+      }
+
+      .login-visual,
+      .login-panel {
+        min-height: auto;
+      }
+
+      .login-visual {
+        padding-top: 80px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+      }
+
+      .booking-grid,
+      .admin-grid,
+      .auth-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-form {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .dashboard-grid,
+      .fleet-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero {
+        min-height: auto;
+        padding-top: 58px;
+      }
+
+      .hero-metrics,
+      .vehicle-list,
+      .dashboard-grid,
+      .fleet-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .table-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .topbar,
+      .hero,
+      section,
+      footer {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .hero-actions,
+      .card-actions {
+        flex-direction: column;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .specs,
+      .inline-fields,
+      .fleet-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="login-active">
+  <section class="login-page" aria-label="Login page">
+    <div class="login-visual">
+      <div>
+        <p class="eyebrow">DHEV EV Rentals</p>
+        <h1>Login to manage EV bookings and fleet operations.</h1>
+        <p>Customers can book electric vehicles, view fare estimates, upload license details, and track booking history. Admins can monitor bookings, revenue, utilization, and fleet availability.</p>
+      </div>
+    </div>
+    <div class="login-panel">
+      <form class="login-card" id="loginForm">
+        <a class="brand" href="#home" aria-label="DHEV EV Rentals">
+          <span class="brand-mark">EV</span>
+          <span>DHEV Rentals</span>
+        </a>
+        <div>
+          <h2>Welcome back</h2>
+          <p>Use your EV rental login to open the website.</p>
+        </div>
+        <div class="field">
+          <label for="loginEmail">User ID</label>
+          <input id="loginEmail" type="text" value="dhevrentalev" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" value="1234" autocomplete="current-password" required>
+        </div>
+        <div class="inline-fields">
+          <div class="field">
+            <label for="loginRole">Role</label>
+            <select id="loginRole">
+              <option value="Admin">Admin</option>
+              <option value="Customer">Customer</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="rememberLogin">Session</label>
+            <select id="rememberLogin">
+              <option value="yes">Remember me</option>
+              <option value="no">This visit only</option>
+            </select>
+          </div>
+        </div>
+        <button class="button primary" type="submit">Login and Open Website</button>
+        <div class="login-help">User ID: dhevrentalev | Password: 1234</div>
+      </form>
+    </div>
+  </section>
+
+  <div class="app-shell">
+    <nav class="topbar">
+      <a class="brand" href="#home" aria-label="DHEV EV Rentals home">
+        <span class="brand-mark">EV</span>
+        <span>DHEV Rentals</span>
+      </a>
+      <div class="nav-links" aria-label="Main navigation">
+        <a href="#booking">Book EV</a>
+        <a href="#fleet">Fleet</a>
+        <a href="#dashboard">Admin</a>
+        <a href="#account">Account</a>
+        <button class="nav-button" id="logoutButton" type="button">Logout</button>
+      </div>
+    </nav>
+
+    <main>
+      <header class="hero" id="home">
+        <div class="hero-inner">
+          <p class="eyebrow">Electric vehicle rental platform</p>
+          <h1>Rent clean mobility with instant booking control.</h1>
+          <p class="hero-copy">Search available EVs, compare battery range, calculate fares, confirm bookings, and monitor fleet performance from one responsive web application.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#booking">Start Booking</a>
+            <a class="button dark" href="#dashboard">View Dashboard</a>
+          </div>
+          <div class="hero-metrics" aria-label="Platform highlights">
+            <div class="metric">
+              <strong>24/7</strong>
+              <span>Online reservations</span>
+            </div>
+            <div class="metric">
+              <strong>12</strong>
+              <span>Active EVs</span>
+            </div>
+            <div class="metric">
+              <strong>98%</strong>
+              <span>Payment success</span>
+            </div>
+            <div class="metric">
+              <strong>4.8</strong>
+              <span>Customer rating</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section id="booking">
+        <div class="section-heading">
+          <div>
+            <h2>EV Booking</h2>
+          </div>
+          <p>Choose city, pickup and return dates, then reserve an available electric vehicle.</p>
+        </div>
+
+        <div class="panel booking-grid">
+          <aside class="booking-form" aria-label="Booking filters">
+            <div class="form-grid">
+              <div class="field">
+                <label for="customerName">Customer name</label>
+                <input id="customerName" type="text" value="Dhev Pragathish" autocomplete="name">
+              </div>
+              <div class="field">
+                <label for="location">Pickup location</label>
+                <select id="location">
+                  <option value="All">All locations</option>
+                  <option value="Coimbatore">Coimbatore</option>
+                  <option value="Chennai">Chennai</option>
+                  <option value="Bengaluru">Bengaluru</option>
+                  <option value="Erode">Erode</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="pickupDate">Pickup date</label>
+                <input id="pickupDate" type="date">
+              </div>
+              <div class="field">
+                <label for="returnDate">Return date</label>
+                <input id="returnDate" type="date">
+              </div>
+              <div class="inline-fields">
+                <div class="field">
+                  <label for="vehicleType">Vehicle type</label>
+                  <select id="vehicleType">
+                    <option value="All">All types</option>
+                    <option value="SUV">SUV</option>
+                    <option value="Premium SUV">Premium SUV</option>
+                    <option value="Scooter">Scooter</option>
+                    <option value="Crossover">Crossover</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="sortBy">Sort by</label>
+                  <select id="sortBy">
+                    <option value="price">Lowest fare</option>
+                    <option value="range">Highest range</option>
+                    <option value="battery">Highest battery</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="searchVehicle">Search EV</label>
+                <input id="searchVehicle" type="search" placeholder="Search by model, city, or type">
+              </div>
+              <div class="inline-fields">
+                <div class="field">
+                  <label for="paymentMethod">Payment method</label>
+                  <select id="paymentMethod">
+                    <option value="Razorpay">Razorpay</option>
+                    <option value="Stripe">Stripe</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Pay at pickup">Pay at pickup</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="couponCode">Coupon</label>
+                  <input id="couponCode" type="text" placeholder="Try GREEN10">
+                </div>
+              </div>
+              <div class="field">
+                <label for="license">Driving license upload</label>
+                <input id="license" type="file" accept=".jpg,.jpeg,.png,.pdf">
+              </div>
+            </div>
+
+            <div class="summary" aria-live="polite">
+              <div class="summary-row">
+                <span>Selected EV</span>
+                <strong id="selectedVehicle">None</strong>
+              </div>
+              <div class="summary-row">
+                <span>Rental days</span>
+                <strong id="rentalDays">1</strong>
+              </div>
+              <div class="summary-row">
+                <span>Payment gateway</span>
+                <strong id="selectedPayment">Razorpay</strong>
+              </div>
+              <div class="summary-row">
+                <span>Discount</span>
+                <strong id="discountAmount">Rs. 0</strong>
+              </div>
+              <div class="summary-row summary-total">
+                <span>Total fare</span>
+                <strong id="totalFare">Rs. 0</strong>
+              </div>
+              <button class="button primary" id="confirmBooking" type="button">Confirm Booking</button>
+            </div>
+          </aside>
+
+          <div class="vehicle-area">
+            <div class="vehicle-toolbar">
+              <p id="availabilityText">Showing available EVs</p>
+              <span class="badge" id="bookingGuard">Double booking check active</span>
+            </div>
+            <div class="vehicle-list" id="vehicleList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="fleet">
+        <div class="section-heading">
+          <div>
+            <h2>Fleet Management</h2>
+          </div>
+          <p>Track vehicle health, battery status, maintenance schedules, and operational availability.</p>
+        </div>
+        <div class="fleet-grid" id="fleetGrid"></div>
+      </section>
+
+      <section id="dashboard">
+        <div class="section-heading">
+          <div>
+            <h2>Admin Dashboard</h2>
+          </div>
+          <p>Monitor bookings, users, revenue, invoices, and utilization statistics.</p>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="dash-card">
+            <span>Total revenue</span>
+            <strong id="dashRevenue">Rs. 0</strong>
+            <small>This month</small>
+          </div>
+          <div class="dash-card">
+            <span>Confirmed bookings</span>
+            <strong id="dashBookings">0</strong>
+            <small>Live records</small>
+          </div>
+          <div class="dash-card">
+            <span>Fleet utilization</span>
+            <strong id="dashUtilization">0%</strong>
+            <small>Reserved EVs</small>
+          </div>
+          <div class="dash-card">
+            <span>Registered users</span>
+            <strong id="dashUsers">184</strong>
+            <small>JWT secured</small>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <div class="admin-panel">
+            <h3>Booking Records</h3>
+            <div class="table" id="adminBookings"></div>
+          </div>
+          <div class="admin-panel">
+            <h3>Add EV</h3>
+            <form class="admin-form" id="addVehicleForm">
+              <div class="field">
+                <label for="newVehicleName">Vehicle name</label>
+                <input id="newVehicleName" type="text" placeholder="Mahindra XUV400 EV" required>
+              </div>
+              <div class="inline-fields">
+                <div class="field">
+                  <label for="newVehicleType">Type</label>
+                  <input id="newVehicleType" type="text" placeholder="SUV" required>
+                </div>
+                <div class="field">
+                  <label for="newVehicleLocation">Location</label>
+                  <input id="newVehicleLocation" type="text" placeholder="Coimbatore" required>
+                </div>
+              </div>
+              <div class="inline-fields">
+                <div class="field">
+                  <label for="newVehicleRange">Range km</label>
+                  <input id="newVehicleRange" type="number" min="1" value="375" required>
+                </div>
+                <div class="field">
+                  <label for="newVehiclePrice">Fare / day</label>
+                  <input id="newVehiclePrice" type="number" min="1" value="2200" required>
+                </div>
+              </div>
+              <button class="button primary" type="submit">Add Vehicle</button>
+            </form>
+            <h3>Booking History</h3>
+            <div class="booking-history" id="bookingHistory"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-section" id="account">
+        <div class="auth-grid">
+          <div class="auth-copy">
+            <h2>User Module</h2>
+            <p>Customer profile management, JWT authentication, license verification, online payment status, invoices, and email notifications can connect to a Node.js, Express.js, and MongoDB backend.</p>
+          </div>
+          <form class="auth-card" id="accountForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" type="email" value="customer@dhevrentals.com" autocomplete="email">
+              </div>
+              <div class="field">
+                <label for="phone">Phone</label>
+                <input id="phone" type="tel" value="+91 93639 00704" autocomplete="tel">
+              </div>
+              <div class="field">
+                <label for="password">Password</label>
+                <input id="password" type="password" value="dhevrentals" autocomplete="current-password">
+              </div>
+              <button class="button primary" type="submit">Login / Register</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>DHEV EV Rental and Booking Management Platform | Built with HTML, CSS, and JavaScript | Ready for React, Node.js, Express.js, MongoDB, JWT, and Stripe/Razorpay integration.</div>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <strong id="toastTitle">Booking confirmed</strong>
+    <span id="toastMessage">Invoice generated and notification queued.</span>
+  </div>
+
+  <script>
+    const vehicles = [
+      {
+        id: "ev-001",
+        name: "Tata Nexon EV Max",
+        type: "SUV",
+        location: "Coimbatore",
+        range: 453,
+        battery: 88,
+        seats: 5,
+        price: 2400,
+        status: "Available",
+        maintenance: "12 Jul 2026"
+      },
+      {
+        id: "ev-002",
+        name: "MG ZS EV",
+        type: "Premium SUV",
+        location: "Chennai",
+        range: 461,
+        battery: 76,
+        seats: 5,
+        price: 2800,
+        status: "Available",
+        maintenance: "18 Jul 2026"
+      },
+      {
+        id: "ev-003",
+        name: "Ather 450X",
+        type: "Scooter",
+        location: "Bengaluru",
+        range: 150,
+        battery: 94,
+        seats: 2,
+        price: 850,
+        status: "Available",
+        maintenance: "09 Jul 2026"
+      },
+      {
+        id: "ev-004",
+        name: "Hyundai Kona Electric",
+        type: "Crossover",
+        location: "Erode",
+        range: 452,
+        battery: 52,
+        seats: 5,
+        price: 2600,
+        status: "Service Soon",
+        maintenance: "05 Jul 2026"
+      }
+    ];
+
+    const seededBookings = [
+      {
+        id: "INV-2601",
+        customer: "Arun Kumar",
+        vehicleId: "ev-002",
+        vehicleName: "MG ZS EV",
+        location: "Chennai",
+        pickup: "2026-07-08",
+        drop: "2026-07-10",
+        amount: 5600,
+        status: "Paid"
+      }
+    ];
+
+    const state = {
+      selectedVehicleId: null,
+      bookings: JSON.parse(localStorage.getItem("dhevBookings") || "null") || seededBookings
+    };
+
+    const savedVehicles = JSON.parse(localStorage.getItem("dhevVehicles") || "[]");
+    vehicles.push(...savedVehicles);
+
+    const el = {
+      location: document.getElementById("location"),
+      pickupDate: document.getElementById("pickupDate"),
+      returnDate: document.getElementById("returnDate"),
+      customerName: document.getElementById("customerName"),
+      vehicleType: document.getElementById("vehicleType"),
+      sortBy: document.getElementById("sortBy"),
+      searchVehicle: document.getElementById("searchVehicle"),
+      paymentMethod: document.getElementById("paymentMethod"),
+      couponCode: document.getElementById("couponCode"),
+      vehicleList: document.getElementById("vehicleList"),
+      fleetGrid: document.getElementById("fleetGrid"),
+      selectedVehicle: document.getElementById("selectedVehicle"),
+      rentalDays: document.getElementById("rentalDays"),
+      totalFare: document.getElementById("totalFare"),
+      discountAmount: document.getElementById("discountAmount"),
+      selectedPayment: document.getElementById("selectedPayment"),
+      confirmBooking: document.getElementById("confirmBooking"),
+      availabilityText: document.getElementById("availabilityText"),
+      adminBookings: document.getElementById("adminBookings"),
+      bookingHistory: document.getElementById("bookingHistory"),
+      dashRevenue: document.getElementById("dashRevenue"),
+      dashBookings: document.getElementById("dashBookings"),
+      dashUtilization: document.getElementById("dashUtilization"),
+      toast: document.getElementById("toast"),
+      toastTitle: document.getElementById("toastTitle"),
+      toastMessage: document.getElementById("toastMessage"),
+      loginForm: document.getElementById("loginForm"),
+      loginEmail: document.getElementById("loginEmail"),
+      loginPassword: document.getElementById("loginPassword"),
+      loginRole: document.getElementById("loginRole"),
+      rememberLogin: document.getElementById("rememberLogin"),
+      logoutButton: document.getElementById("logoutButton"),
+      accountForm: document.getElementById("accountForm"),
+      addVehicleForm: document.getElementById("addVehicleForm"),
+      newVehicleName: document.getElementById("newVehicleName"),
+      newVehicleType: document.getElementById("newVehicleType"),
+      newVehicleLocation: document.getElementById("newVehicleLocation"),
+      newVehicleRange: document.getElementById("newVehicleRange"),
+      newVehiclePrice: document.getElementById("newVehiclePrice")
+    };
+
+    const currency = new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0
+    });
+
+    function todayIso() {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      return now.toISOString().slice(0, 10);
+    }
+
+    function addDaysIso(dateIso, days) {
+      const date = new Date(dateIso);
+      date.setDate(date.getDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function getRentalDays() {
+      const pickup = new Date(el.pickupDate.value);
+      const drop = new Date(el.returnDate.value);
+      const difference = Math.ceil((drop - pickup) / 86400000);
+      return Math.max(difference, 1);
+    }
+
+    function overlaps(startA, endA, startB, endB) {
+      return startA < endB && startB < endA;
+    }
+
+    function isVehicleAvailable(vehicleId) {
+      return !state.bookings.some((booking) => {
+        return booking.vehicleId === vehicleId &&
+          booking.status !== "Cancelled" &&
+          overlaps(el.pickupDate.value, el.returnDate.value, booking.pickup, booking.drop);
+      });
+    }
+
+    function getSelectedVehicle() {
+      return vehicles.find((vehicle) => vehicle.id === state.selectedVehicleId);
+    }
+
+    function getDiscountRate() {
+      const coupon = el.couponCode.value.trim().toUpperCase();
+      if (coupon === "GREEN10") {
+        return 0.1;
+      }
+      if (coupon === "EV20") {
+        return 0.2;
+      }
+      return 0;
+    }
+
+    function calculateFare(vehicle) {
+      if (!vehicle) {
+        return { subtotal: 0, discount: 0, total: 0 };
+      }
+      const subtotal = vehicle.price * getRentalDays();
+      const discount = Math.round(subtotal * getDiscountRate());
+      return {
+        subtotal,
+        discount,
+        total: subtotal - discount
+      };
+    }
+
+    function renderVehicles() {
+      const location = el.location.value;
+      const type = el.vehicleType.value;
+      const query = el.searchVehicle.value.trim().toLowerCase();
+      const filtered = vehicles.filter((vehicle) => {
+        const matchesLocation = location === "All" || vehicle.location === location;
+        const matchesType = type === "All" || vehicle.type === type;
+        const matchesQuery = !query || [vehicle.name, vehicle.type, vehicle.location].join(" ").toLowerCase().includes(query);
+        return matchesLocation && matchesType && matchesQuery;
+      }).sort((a, b) => {
+        if (el.sortBy.value === "range") {
+          return b.range - a.range;
+        }
+        if (el.sortBy.value === "battery") {
+          return b.battery - a.battery;
+        }
+        return a.price - b.price;
+      });
+
+      el.availabilityText.textContent = filtered.length + (filtered.length === 1 ? " EV found" : " EVs found");
+
+      if (filtered.length === 0) {
+        el.vehicleList.innerHTML = `
+          <div class="booking-item">
+            <strong>No vehicles match these filters</strong>
+            <span>Try all locations, a different vehicle type, or a shorter search term.</span>
+          </div>
+        `;
+        state.selectedVehicleId = null;
+        updateSummary();
+        return;
+      }
+
+      el.vehicleList.innerHTML = filtered.map((vehicle) => {
+        const available = isVehicleAvailable(vehicle.id);
+        const badgeClass = available ? "" : "danger";
+        const status = available ? vehicle.status : "Booked";
+
+        return `
+          <article class="vehicle-card">
+            <div class="vehicle-image">
+              <span class="badge ${badgeClass}">${status}</span>
+            </div>
+            <div class="vehicle-body">
+              <div class="vehicle-title">
+                <div>
+                  <h3>${vehicle.name}</h3>
+                  <span>${vehicle.type} | ${vehicle.location}</span>
+                </div>
+                <div class="price">${currency.format(vehicle.price)}/day</div>
+              </div>
+              <div class="specs">
+                <div class="spec"><strong>${vehicle.range} km</strong><span>Range</span></div>
+                <div class="spec"><strong>${vehicle.battery}%</strong><span>Battery</span></div>
+                <div class="spec"><strong>${vehicle.seats}</strong><span>Seats</span></div>
+              </div>
+              <div class="card-actions">
+                <button class="button primary" type="button" data-select="${vehicle.id}" ${available ? "" : "disabled"}>Select EV</button>
+                <button class="button" type="button" data-invoice="${vehicle.id}">Invoice Preview</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-select]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.selectedVehicleId = button.dataset.select;
+          updateSummary();
+          showToast("EV selected", getSelectedVehicle().name + " is ready for booking.");
+        });
+      });
+
+      document.querySelectorAll("[data-invoice]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const vehicle = vehicles.find((item) => item.id === button.dataset.invoice);
+          const fare = calculateFare(vehicle);
+          showToast("Invoice preview", vehicle.name + " estimate is " + currency.format(fare.total) + " after discount.");
+        });
+      });
+
+      if (!filtered.some((vehicle) => vehicle.id === state.selectedVehicleId)) {
+        state.selectedVehicleId = null;
+      }
+
+      updateSummary();
+    }
+
+    function renderFleet() {
+      el.fleetGrid.innerHTML = vehicles.map((vehicle) => {
+        const available = isVehicleAvailable(vehicle.id);
+        const badgeClass = available ? "" : "danger";
+        return `
+          <article class="fleet-card">
+            <div class="fleet-head">
+              <div>
+                <h3>${vehicle.name}</h3>
+                <span>${vehicle.location} | ${vehicle.type}</span>
+              </div>
+              <span class="badge ${badgeClass}">${available ? vehicle.status : "Booked"}</span>
+            </div>
+            <div class="battery" aria-label="Battery ${vehicle.battery}%">
+              <span style="width: ${vehicle.battery}%"></span>
+            </div>
+            <div class="fleet-meta">
+              <span>Battery: <strong>${vehicle.battery}%</strong></span>
+              <span>Range: <strong>${vehicle.range} km</strong></span>
+              <span>Seats: <strong>${vehicle.seats}</strong></span>
+              <span>Service: <strong>${vehicle.maintenance}</strong></span>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderDashboard() {
+      const activeBookings = state.bookings.filter((booking) => booking.status !== "Cancelled");
+      const totalRevenue = activeBookings.reduce((sum, booking) => sum + booking.amount, 0);
+      const utilization = Math.round((new Set(activeBookings.map((booking) => booking.vehicleId)).size / vehicles.length) * 100);
+
+      el.dashRevenue.textContent = currency.format(totalRevenue);
+      el.dashBookings.textContent = activeBookings.length;
+      el.dashUtilization.textContent = utilization + "%";
+
+      el.adminBookings.innerHTML = state.bookings.map((booking) => `
+        <div class="table-row">
+          <strong>${booking.id}</strong>
+          <span>${booking.vehicleName}</span>
+          <span>${currency.format(booking.amount)}</span>
+          <span class="badge ${booking.status === "Cancelled" ? "danger" : ""}">${booking.status}</span>
+          <button class="button danger" type="button" data-cancel="${booking.id}" ${booking.status === "Cancelled" ? "disabled" : ""}>Cancel</button>
+        </div>
+      `).join("");
+
+      el.bookingHistory.innerHTML = state.bookings.slice().reverse().map((booking) => `
+        <div class="booking-item">
+          <strong>${booking.customer}</strong>
+          <span>${booking.vehicleName} | ${booking.pickup} to ${booking.drop} | ${booking.payment || "Razorpay"} | ${booking.status}</span>
+        </div>
+      `).join("");
+
+      document.querySelectorAll("[data-cancel]").forEach((button) => {
+        button.addEventListener("click", () => cancelBooking(button.dataset.cancel));
+      });
+    }
+
+    function updateSummary() {
+      const vehicle = getSelectedVehicle();
+      const days = getRentalDays();
+      const fare = calculateFare(vehicle);
+      el.rentalDays.textContent = days;
+      el.selectedVehicle.textContent = vehicle ? vehicle.name : "None";
+      el.selectedPayment.textContent = el.paymentMethod.value;
+      el.discountAmount.textContent = currency.format(fare.discount);
+      el.totalFare.textContent = currency.format(fare.total);
+    }
+
+    function confirmBooking() {
+      const vehicle = getSelectedVehicle();
+      if (!vehicle) {
+        showToast("Select an EV", "Choose an available vehicle before payment.");
+        return;
+      }
+
+      if (!isVehicleAvailable(vehicle.id)) {
+        showToast("Booking blocked", "This EV is already reserved for those dates.");
+        renderAll();
+        return;
+      }
+
+      const booking = {
+        id: "INV-" + Math.floor(2600 + Math.random() * 7000),
+        customer: el.customerName.value.trim() || "Guest Customer",
+        vehicleId: vehicle.id,
+        vehicleName: vehicle.name,
+        location: vehicle.location,
+        pickup: el.pickupDate.value,
+        drop: el.returnDate.value,
+        amount: calculateFare(vehicle).total,
+        payment: el.paymentMethod.value,
+        status: el.paymentMethod.value === "Pay at pickup" ? "Pending" : "Paid"
+      };
+
+      state.bookings.push(booking);
+      localStorage.setItem("dhevBookings", JSON.stringify(state.bookings));
+      showToast("Booking confirmed", booking.id + " created. Payment captured and email queued.");
+      state.selectedVehicleId = null;
+      renderAll();
+    }
+
+    function cancelBooking(bookingId) {
+      const booking = state.bookings.find((item) => item.id === bookingId);
+      if (!booking) {
+        return;
+      }
+      booking.status = "Cancelled";
+      localStorage.setItem("dhevBookings", JSON.stringify(state.bookings));
+      showToast("Booking cancelled", booking.id + " is cancelled and the vehicle is released.");
+      renderAll();
+    }
+
+    function addVehicle(event) {
+      event.preventDefault();
+      const vehicle = {
+        id: "ev-" + Date.now(),
+        name: el.newVehicleName.value.trim(),
+        type: el.newVehicleType.value.trim(),
+        location: el.newVehicleLocation.value.trim(),
+        range: Number(el.newVehicleRange.value),
+        battery: 100,
+        seats: 5,
+        price: Number(el.newVehiclePrice.value),
+        status: "Available",
+        maintenance: "Schedule pending"
+      };
+
+      vehicles.push(vehicle);
+      const customVehicles = vehicles.filter((item) => item.id.startsWith("ev-") && item.id.length > 8);
+      localStorage.setItem("dhevVehicles", JSON.stringify(customVehicles));
+      el.addVehicleForm.reset();
+      showToast("Vehicle added", vehicle.name + " is now listed in the fleet.");
+      renderAll();
+    }
+
+    function showToast(title, message) {
+      el.toastTitle.textContent = title;
+      el.toastMessage.textContent = message;
+      el.toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => el.toast.classList.remove("show"), 3600);
+    }
+
+    function renderAll() {
+      renderVehicles();
+      renderFleet();
+      renderDashboard();
+    }
+
+    function openWebsite(user) {
+      document.body.classList.remove("login-active");
+      showToast("Login successful", user.role + " access granted for " + user.email + ".");
+      window.location.hash = "home";
+    }
+
+    function closeWebsite() {
+      localStorage.removeItem("dhevSession");
+      sessionStorage.removeItem("dhevSession");
+      document.body.classList.add("login-active");
+      window.location.hash = "";
+    }
+
+    function getSavedSession() {
+      return JSON.parse(localStorage.getItem("dhevSession") || sessionStorage.getItem("dhevSession") || "null");
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const email = el.loginEmail.value.trim();
+      const password = el.loginPassword.value.trim();
+
+      if (!email || !password) {
+        showToast("Login required", "Enter user ID and password to continue.");
+        return;
+      }
+
+      if (email !== "dhevrentalev" || password !== "1234") {
+        showToast("Login failed", "Use user ID dhevrentalev and password 1234.");
+        return;
+      }
+
+      const user = {
+        email,
+        role: el.loginRole.value,
+        signedInAt: new Date().toISOString()
+      };
+
+      const storage = el.rememberLogin.value === "yes" ? localStorage : sessionStorage;
+      storage.setItem("dhevSession", JSON.stringify(user));
+      openWebsite(user);
+    }
+
+    function setInitialDates() {
+      const today = todayIso();
+      el.pickupDate.min = today;
+      el.returnDate.min = addDaysIso(today, 1);
+      el.pickupDate.value = today;
+      el.returnDate.value = addDaysIso(today, 2);
+    }
+
+    setInitialDates();
+    renderAll();
+
+    const savedSession = getSavedSession();
+    if (savedSession) {
+      document.body.classList.remove("login-active");
+    }
+
+    [el.location, el.pickupDate, el.returnDate].forEach((field) => {
+      field.addEventListener("change", () => {
+        if (el.returnDate.value <= el.pickupDate.value) {
+          el.returnDate.value = addDaysIso(el.pickupDate.value, 1);
+        }
+        el.returnDate.min = addDaysIso(el.pickupDate.value, 1);
+        renderAll();
+      });
+    });
+
+    [el.vehicleType, el.sortBy, el.paymentMethod, el.couponCode].forEach((field) => {
+      field.addEventListener("change", renderAll);
+    });
+
+    el.searchVehicle.addEventListener("input", renderAll);
+
+    el.confirmBooking.addEventListener("click", confirmBooking);
+    el.addVehicleForm.addEventListener("submit", addVehicle);
+    el.loginForm.addEventListener("submit", handleLogin);
+    el.logoutButton.addEventListener("click", closeWebsite);
+
+    el.accountForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      showToast("Authenticated", "JWT session created for the customer dashboard.");
+    });
+  </script>
+</body>
+</html>
