@@ -100,6 +100,52 @@
       margin-top: 8px;
     }
 
+    .sub-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 20px 0 0;
+    }
+
+    .file-controls {
+      display: flex;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: #f1fbf6;
+      text-align: center;
+      box-shadow: 0 10px 26px rgba(12, 96, 73, 0.08);
+    }
+
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .stat-label {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    #importSection {
+      margin-top: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
     button.primary {
       background: var(--primary);
       color: white;
@@ -147,6 +193,16 @@
       font-weight: 700;
     }
 
+    .status-late {
+      color: #e09d0d;
+      font-weight: 700;
+    }
+
+    .status-excused {
+      color: #2b6cb0;
+      font-weight: 700;
+    }
+
     .note {
       margin-top: 16px;
       color: var(--muted);
@@ -170,31 +226,99 @@
         <input id="nameInput" type="text" placeholder="Enter attendee name" />
       </label>
       <label>
+        Class / Group
+        <input id="classInput" type="text" placeholder="Enter class or group" />
+      </label>
+      <label>
         Status
         <select id="statusInput">
           <option value="Present">Present</option>
           <option value="Absent">Absent</option>
           <option value="Late">Late</option>
+          <option value="Excused">Excused</option>
         </select>
       </label>
       <label>
         Date
         <input id="dateInput" type="date" />
       </label>
+      <label>
+        Notes
+        <input id="noteInput" type="text" placeholder="Optional notes" />
+      </label>
     </div>
 
     <div class="button-row">
       <button id="addButton" class="primary">Add Attendance</button>
+      <button id="updateButton" class="secondary" hidden>Update Record</button>
       <button id="clearButton" class="secondary">Clear All</button>
       <button id="todayButton" class="secondary">Use Today</button>
+    </div>
+
+    <div class="sub-controls">
+      <label>
+        Search
+        <input id="searchInput" type="text" placeholder="Search by name, class, notes" />
+      </label>
+      <label>
+        Filter status
+        <select id="filterStatus">
+          <option value="All">All</option>
+          <option value="Present">Present</option>
+          <option value="Absent">Absent</option>
+          <option value="Late">Late</option>
+          <option value="Excused">Excused</option>
+        </select>
+      </label>
+      <label>
+        Filter date
+        <input id="filterDate" type="date" />
+      </label>
+      <div class="file-controls">
+        <button id="exportButton" class="secondary">Export CSV</button>
+        <button id="importToggleButton" class="secondary">Import CSV</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="totalCount">0</div>
+        <div class="stat-label">Total Records</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="presentCount">0</div>
+        <div class="stat-label">Present</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="absentCount">0</div>
+        <div class="stat-label">Absent</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="lateCount">0</div>
+        <div class="stat-label">Late</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="excusedCount">0</div>
+        <div class="stat-label">Excused</div>
+      </div>
+    </div>
+
+    <div id="importSection" hidden>
+      <label>
+        Upload CSV
+        <input id="importFile" type="file" accept="text/csv" />
+      </label>
+      <button id="importButton" class="secondary">Import Records</button>
     </div>
 
     <table>
       <thead>
         <tr>
           <th>Name</th>
+          <th>Class</th>
           <th>Status</th>
           <th>Date</th>
+          <th>Notes</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -206,19 +330,37 @@
 
   <script>
     const nameInput = document.getElementById('nameInput');
+    const classInput = document.getElementById('classInput');
     const statusInput = document.getElementById('statusInput');
     const dateInput = document.getElementById('dateInput');
+    const noteInput = document.getElementById('noteInput');
     const addButton = document.getElementById('addButton');
+    const updateButton = document.getElementById('updateButton');
     const clearButton = document.getElementById('clearButton');
     const todayButton = document.getElementById('todayButton');
     const attendanceTable = document.getElementById('attendanceTable');
+    const searchInput = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    const filterDate = document.getElementById('filterDate');
+    const exportButton = document.getElementById('exportButton');
+    const importToggleButton = document.getElementById('importToggleButton');
+    const importSection = document.getElementById('importSection');
+    const importFile = document.getElementById('importFile');
+    const importButton = document.getElementById('importButton');
+    const totalCount = document.getElementById('totalCount');
+    const presentCount = document.getElementById('presentCount');
+    const absentCount = document.getElementById('absentCount');
+    const lateCount = document.getElementById('lateCount');
+    const excusedCount = document.getElementById('excusedCount');
 
     const STORAGE_KEY = 'attendanceRecords';
 
     let attendanceRecords = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let editingId = null;
 
     const formatDate = (value) => {
       const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
       return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
     };
 
@@ -226,63 +368,216 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(attendanceRecords));
     };
 
-    const renderTable = () => {
-      attendanceTable.innerHTML = '';
-      attendanceRecords.forEach((record, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${record.name}</td>
-          <td class="status-${record.status.toLowerCase()}">${record.status}</td>
-          <td>${formatDate(record.date)}</td>
-          <td><button data-index="${index}" class="secondary">Remove</button></td>
-        `;
-        attendanceTable.appendChild(row);
+    const updateStats = (records) => {
+      totalCount.textContent = records.length;
+      presentCount.textContent = records.filter((record) => record.status === 'Present').length;
+      absentCount.textContent = records.filter((record) => record.status === 'Absent').length;
+      lateCount.textContent = records.filter((record) => record.status === 'Late').length;
+      excusedCount.textContent = records.filter((record) => record.status === 'Excused').length;
+    };
+
+    const getFilteredRecords = () => {
+      const query = searchInput.value.trim().toLowerCase();
+      const status = filterStatus.value;
+      const date = filterDate.value;
+
+      return attendanceRecords.filter((record) => {
+        const matchesQuery = [record.name, record.className, record.notes].some((value) =>
+          value.toLowerCase().includes(query)
+        );
+        const matchesStatus = status === 'All' || record.status === status;
+        const matchesDate = !date || record.date === date;
+        return matchesQuery && matchesStatus && matchesDate;
       });
     };
 
+    const renderTable = () => {
+      const records = getFilteredRecords();
+      attendanceTable.innerHTML = '';
+      records.forEach((record, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${record.name}</td>
+          <td>${record.className}</td>
+          <td class="status-${record.status.toLowerCase()}">${record.status}</td>
+          <td>${formatDate(record.date)}</td>
+          <td>${record.notes || ''}</td>
+          <td>
+            <button data-action="edit" data-id="${record.id}" class="secondary">Edit</button>
+            <button data-action="remove" data-id="${record.id}" class="secondary">Remove</button>
+          </td>
+        `;
+        attendanceTable.appendChild(row);
+      });
+      updateStats(records);
+    };
+
+    const clearInputs = () => {
+      nameInput.value = '';
+      classInput.value = '';
+      statusInput.value = 'Present';
+      dateInput.value = '';
+      noteInput.value = '';
+      editingId = null;
+      updateButton.hidden = true;
+      addButton.hidden = false;
+    };
+
+    const getNewId = () => `att-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
     const addRecord = () => {
       const name = nameInput.value.trim();
+      const className = classInput.value.trim() || 'General';
       const status = statusInput.value;
       const date = dateInput.value || new Date().toISOString().split('T')[0];
+      const notes = noteInput.value.trim();
 
       if (!name) {
         alert('Please enter a name.');
         return;
       }
 
-      attendanceRecords.unshift({ name, status, date });
+      attendanceRecords.unshift({
+        id: getNewId(),
+        name,
+        className,
+        status,
+        date,
+        notes,
+      });
       saveRecords();
       renderTable();
-      nameInput.value = '';
+      clearInputs();
       nameInput.focus();
     };
 
-    const clearAll = () => {
-      if (!confirm('Remove all attendance records?')) return;
-      attendanceRecords = [];
+    const updateRecord = () => {
+      if (!editingId) return;
+      const record = attendanceRecords.find((item) => item.id === editingId);
+      if (!record) return;
+
+      record.name = nameInput.value.trim();
+      record.className = classInput.value.trim() || 'General';
+      record.status = statusInput.value;
+      record.date = dateInput.value || new Date().toISOString().split('T')[0];
+      record.notes = noteInput.value.trim();
+
       saveRecords();
       renderTable();
+      clearInputs();
+    };
+
+    const populateForm = (record) => {
+      nameInput.value = record.name;
+      classInput.value = record.className;
+      statusInput.value = record.status;
+      dateInput.value = record.date;
+      noteInput.value = record.notes;
+      editingId = record.id;
+      updateButton.hidden = false;
+      addButton.hidden = true;
+      nameInput.focus();
+    };
+
+    const removeRecord = (id) => {
+      attendanceRecords = attendanceRecords.filter((record) => record.id !== id);
+      saveRecords();
+      renderTable();
+    };
+
+    const exportCsv = () => {
+      const header = ['Name', 'Class', 'Status', 'Date', 'Notes'];
+      const rows = attendanceRecords.map((record) => [
+        record.name,
+        record.className,
+        record.status,
+        record.date,
+        record.notes || '',
+      ]);
+      const csv = [header, ...rows]
+        .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'attendance-records.csv';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    };
+
+    const parseCsv = (text) => {
+      const lines = text.trim().split(/\r?\n/);
+      const rows = lines.map((line) => line.split(/,(?=(?:[^"]*"[^"]*")*(?![^"]))/).map((cell) => cell.replace(/^"|"$/g, '').trim()));
+      const [header, ...data] = rows;
+      return data.map((row) => ({
+        id: getNewId(),
+        name: row[0] || 'Unknown',
+        className: row[1] || 'General',
+        status: ['Present', 'Absent', 'Late', 'Excused'].includes(row[2]) ? row[2] : 'Present',
+        date: row[3] || new Date().toISOString().split('T')[0],
+        notes: row[4] || '',
+      }));
+    };
+
+    const importRecords = () => {
+      const file = importFile.files[0];
+      if (!file) {
+        alert('Please choose a CSV file first.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const imported = parseCsv(reader.result);
+          attendanceRecords = [...imported, ...attendanceRecords];
+          saveRecords();
+          renderTable();
+          importFile.value = '';
+          importSection.hidden = true;
+        } catch (error) {
+          alert('Unable to import CSV. Please use a valid file format.');
+        }
+      };
+      reader.readAsText(file);
     };
 
     attendanceTable.addEventListener('click', (event) => {
       const button = event.target.closest('button');
       if (!button) return;
-      const index = Number(button.dataset.index);
-      attendanceRecords.splice(index, 1);
-      saveRecords();
-      renderTable();
+      const action = button.dataset.action;
+      const id = button.dataset.id;
+      if (action === 'edit') {
+        const record = attendanceRecords.find((item) => item.id === id);
+        if (record) populateForm(record);
+      }
+      if (action === 'remove') {
+        removeRecord(id);
+      }
     });
 
     addButton.addEventListener('click', addRecord);
+    updateButton.addEventListener('click', updateRecord);
     clearButton.addEventListener('click', clearAll);
     todayButton.addEventListener('click', () => {
       dateInput.value = new Date().toISOString().split('T')[0];
       nameInput.focus();
     });
+    searchInput.addEventListener('input', renderTable);
+    filterStatus.addEventListener('change', renderTable);
+    filterDate.addEventListener('change', renderTable);
+    exportButton.addEventListener('click', exportCsv);
+    importToggleButton.addEventListener('click', () => {
+      importSection.hidden = !importSection.hidden;
+    });
+    importButton.addEventListener('click', importRecords);
 
     window.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        addRecord();
+      if (event.key === 'Enter' && document.activeElement !== importFile) {
+        event.preventDefault();
+        if (editingId) updateRecord(); else addRecord();
       }
     });
 
