@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance App</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --primary: #168b68;
+      --primary-dark: #0c6049;
+      --accent: #2764b4;
+      --text: #14231d;
+      --muted: #66746e;
+      --shadow: 0 18px 45px rgba(20, 35, 29, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #e9f2ed, #eff6f5);
+      color: var(--text);
+    }
+
+    .app-shell {
+      width: min(960px, 100%);
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .top-nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .top-nav a {
+      color: var(--primary-dark);
+      font-weight: 700;
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #f1fbf6;
+    }
+
+    .top-nav a:hover {
+      background: #e0f3e6;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 2.1rem;
+    }
+
+    .info {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .controls label {
+      display: grid;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    input, select, button {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #d9e2dc;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font: inherit;
+      background: white;
+      color: var(--text);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    button.primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    button.secondary {
+      background: #eef6f1;
+      color: var(--text);
+      border: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: #f9fcf9;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e3ece4;
+    }
+
+    th {
+      background: #eef6f1;
+      color: var(--primary-dark);
+      font-weight: 800;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status-present {
+      color: #0c6049;
+      font-weight: 700;
+    }
+
+    .status-absent {
+      color: #ca4e4e;
+      font-weight: 700;
+    }
+
+    .note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <div class="top-nav">
+      <a href="index.html">Calculator</a>
+      <a href="attendance.html">Attendance App</a>
+    </div>
+    <h1>Attendance App</h1>
+    <p class="info">Add attendees, record presence, and manage attendance right in the browser. The list is saved locally, so anyone with the link can open the page and use it.</p>
+
+    <div class="controls">
+      <label>
+        Name
+        <input id="nameInput" type="text" placeholder="Enter attendee name" />
+      </label>
+      <label>
+        Status
+        <select id="statusInput">
+          <option value="Present">Present</option>
+          <option value="Absent">Absent</option>
+          <option value="Late">Late</option>
+        </select>
+      </label>
+      <label>
+        Date
+        <input id="dateInput" type="date" />
+      </label>
+    </div>
+
+    <div class="button-row">
+      <button id="addButton" class="primary">Add Attendance</button>
+      <button id="clearButton" class="secondary">Clear All</button>
+      <button id="todayButton" class="secondary">Use Today</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="attendanceTable"></tbody>
+    </table>
+
+    <p class="note">Tip: You can open this page from any browser. Your attendance records are saved in local storage on your device. To share with others, send them the page link and they can create their own records.</p>
+  </main>
+
+  <script>
+    const nameInput = document.getElementById('nameInput');
+    const statusInput = document.getElementById('statusInput');
+    const dateInput = document.getElementById('dateInput');
+    const addButton = document.getElementById('addButton');
+    const clearButton = document.getElementById('clearButton');
+    const todayButton = document.getElementById('todayButton');
+    const attendanceTable = document.getElementById('attendanceTable');
+
+    const STORAGE_KEY = 'attendanceRecords';
+
+    let attendanceRecords = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+    const formatDate = (value) => {
+      const date = new Date(value);
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    };
+
+    const saveRecords = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(attendanceRecords));
+    };
+
+    const renderTable = () => {
+      attendanceTable.innerHTML = '';
+      attendanceRecords.forEach((record, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${record.name}</td>
+          <td class="status-${record.status.toLowerCase()}">${record.status}</td>
+          <td>${formatDate(record.date)}</td>
+          <td><button data-index="${index}" class="secondary">Remove</button></td>
+        `;
+        attendanceTable.appendChild(row);
+      });
+    };
+
+    const addRecord = () => {
+      const name = nameInput.value.trim();
+      const status = statusInput.value;
+      const date = dateInput.value || new Date().toISOString().split('T')[0];
+
+      if (!name) {
+        alert('Please enter a name.');
+        return;
+      }
+
+      attendanceRecords.unshift({ name, status, date });
+      saveRecords();
+      renderTable();
+      nameInput.value = '';
+      nameInput.focus();
+    };
+
+    const clearAll = () => {
+      if (!confirm('Remove all attendance records?')) return;
+      attendanceRecords = [];
+      saveRecords();
+      renderTable();
+    };
+
+    attendanceTable.addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      const index = Number(button.dataset.index);
+      attendanceRecords.splice(index, 1);
+      saveRecords();
+      renderTable();
+    });
+
+    addButton.addEventListener('click', addRecord);
+    clearButton.addEventListener('click', clearAll);
+    todayButton.addEventListener('click', () => {
+      dateInput.value = new Date().toISOString().split('T')[0];
+      nameInput.focus();
+    });
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        addRecord();
+      }
+    });
+
+    renderTable();
+  </script>
+</body>
+</html>

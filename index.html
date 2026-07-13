@@ -103,6 +103,25 @@
       color: white;
     }
 
+    .top-nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .top-nav a {
+      color: var(--primary-dark);
+      font-weight: 700;
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: #f1fbf6;
+    }
+
+    .top-nav a:hover {
+      background: #e0f3e6;
+    }
+
     .help {
       margin-top: 18px;
       color: var(--muted);
@@ -113,6 +132,10 @@
 </head>
 <body>
   <main class="calculator">
+    <div class="top-nav">
+      <a href="index.html">Calculator</a>
+      <a href="attendance.html">Attendance App</a>
+    </div>
     <h1>Scientific Calculator</h1>
     <div id="display" class="display">0</div>
     <div class="keypad">
