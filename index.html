@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scientific Calculator</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --surface: #ffffff;
+      --primary: #168b68;
+      --primary-dark: #0c6049;
+      --accent: #2764b4;
+      --text: #14231d;
+      --muted: #66746e;
+      --shadow: 0 18px 45px rgba(20, 35, 29, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #e9f2ed, #eff6f5);
+      color: var(--text);
+    }
+
+    .calculator {
+      width: min(500px, 100%);
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .calculator h1 {
+      margin: 0 0 14px;
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .display {
+      width: 100%;
+      min-height: 90px;
+      margin-bottom: 16px;
+      padding: 22px;
+      border-radius: 22px;
+      border: 1px solid #d9e2dc;
+      background: #f7fbf8;
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: right;
+      color: var(--text);
+      overflow-wrap: anywhere;
+      word-break: break-all;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 18px 0;
+      font-size: 1rem;
+      font-weight: 700;
+      background: #eef6f1;
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button.operator {
+      background: var(--primary);
+      color: white;
+    }
+
+    button.function {
+      background: var(--accent);
+      color: white;
+    }
+
+    button.control {
+      background: #ffd3b2;
+      color: var(--text);
+    }
+
+    button.equal {
+      grid-column: span 2;
+      background: var(--primary-dark);
+      color: white;
+    }
+
+    .help {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator">
+    <h1>Scientific Calculator</h1>
+    <div id="display" class="display">0</div>
+    <div class="keypad">
+      <button class="control" data-action="clear">C</button>
+      <button class="control" data-action="delete">⌫</button>
+      <button class="control" data-action="percent">%</button>
+      <button class="control" data-action="posneg">±</button>
+      <button class="function" data-action="function" data-value="sin(">sin</button>
+      <button class="function" data-action="function" data-value="cos(">cos</button>
+
+      <button class="function" data-action="function" data-value="tan(">tan</button>
+      <button class="function" data-action="function" data-value="log(">log</button>
+      <button class="function" data-action="function" data-value="ln(">ln</button>
+      <button class="function" data-action="function" data-value="sqrt(">√</button>
+      <button class="function" data-action="function" data-value="pi">π</button>
+      <button class="function" data-action="function" data-value="e">e</button>
+
+      <button data-action="digit" data-value="7">7</button>
+      <button data-action="digit" data-value="8">8</button>
+      <button data-action="digit" data-value="9">9</button>
+      <button class="operator" data-action="operator" data-value="/">÷</button>
+      <button class="operator" data-action="operator" data-value="^">^</button>
+      <button class="operator" data-action="operator" data-value="(">(</button>
+
+      <button data-action="digit" data-value="4">4</button>
+      <button data-action="digit" data-value="5">5</button>
+      <button data-action="digit" data-value="6">6</button>
+      <button class="operator" data-action="operator" data-value="*">×</button>
+      <button class="operator" data-action="operator" data-value=")">)</button>
+      <button class="function" data-action="function" data-value="abs(">abs</button>
+
+      <button data-action="digit" data-value="1">1</button>
+      <button data-action="digit" data-value="2">2</button>
+      <button data-action="digit" data-value="3">3</button>
+      <button class="operator" data-action="operator" data-value="-">−</button>
+      <button class="function" data-action="function" data-value="exp(">exp</button>
+      <button class="function" data-action="function" data-value="pow(">pow</button>
+
+      <button data-action="digit" data-value="0" style="grid-column: span 2;">0</button>
+      <button data-action="digit" data-value=".">.</button>
+      <button class="operator" data-action="operator" data-value="+">+</button>
+      <button class="equal" data-action="equals">=</button>
+    </div>
+    <p class="help">Keyboard support: digits, + - * / ^ ( ) Enter = Backspace Esc. Type s/c/t/l for sin/cos/tan/ln and g for log.</p>
+  </main>
+
+  <script>
+    const display = document.getElementById('display');
+    let expression = '0';
+
+    const updateDisplay = () => {
+      display.textContent = expression;
+    };
+
+    const resetExpression = () => {
+      expression = '0';
+    };
+
+    const appendValue = (value) => {
+      if (expression === '0' && value !== '.') {
+        expression = value;
+      } else {
+        expression += value;
+      }
+    };
+
+    const deleteLast = () => {
+      if (expression.length === 1) {
+        resetExpression();
+      } else {
+        expression = expression.slice(0, -1);
+      }
+    };
+
+    const toggleSign = () => {
+      if (expression === '0') return;
+      if (expression.startsWith('-')) {
+        expression = expression.slice(1);
+      } else {
+        expression = '-' + expression;
+      }
+    };
+
+    const parseExpression = (expr) => {
+      let safe = expr
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/\^/g, '**')
+        .replace(/π/g, 'Math.PI')
+        .replace(/\be\b/g, 'Math.E')
+        .replace(/\bsin\(/g, 'Math.sin(')
+        .replace(/\bcos\(/g, 'Math.cos(')
+        .replace(/\btan\(/g, 'Math.tan(')
+        .replace(/\blog\(/g, 'Math.log10(')
+        .replace(/\bln\(/g, 'Math.log(')
+        .replace(/\bsqrt\(/g, 'Math.sqrt(')
+        .replace(/\babs\(/g, 'Math.abs(')
+        .replace(/\bexp\(/g, 'Math.exp(')
+        .replace(/\bpow\(/g, 'Math.pow(');
+
+      safe = safe.replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
+
+      if (!/^[0-9+\-*/().%Mathpieabslnogrtx]+$/.test(safe)) {
+        throw new Error('Invalid expression');
+      }
+
+      return new Function(`return ${safe}`)();
+    };
+
+    const evaluateExpression = () => {
+      try {
+        const result = parseExpression(expression);
+        if (result === Infinity || result === -Infinity || Number.isNaN(result)) {
+          expression = 'Error';
+        } else {
+          expression = String(result).slice(0, 15);
+        }
+      } catch (error) {
+        expression = 'Error';
+      }
+    };
+
+    const handleInput = (action, value) => {
+      switch (action) {
+        case 'digit':
+        case 'operator':
+        case 'function':
+          appendValue(value);
+          break;
+        case 'clear':
+          resetExpression();
+          break;
+        case 'delete':
+          deleteLast();
+          break;
+        case 'posneg':
+          toggleSign();
+          break;
+        case 'percent':
+          appendValue('%');
+          break;
+        case 'equals':
+          evaluateExpression();
+          break;
+      }
+
+      if (expression === '') resetExpression();
+      updateDisplay();
+    };
+
+    document.querySelector('.keypad').addEventListener('click', (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      handleInput(button.dataset.action, button.dataset.value);
+    });
+
+    window.addEventListener('keydown', (event) => {
+      if (event.defaultPrevented) return;
+      const key = event.key;
+      if (/^[0-9]$/.test(key)) {
+        handleInput('digit', key);
+      } else if (key === '.') {
+        handleInput('digit', '.');
+      } else if (['+', '-', '*', '/'].includes(key)) {
+        handleInput('operator', key);
+      } else if (key === '^') {
+        handleInput('operator', '^');
+      } else if (key === '(' || key === ')') {
+        handleInput('operator', key);
+      } else if (key === 'Enter' || key === '=') {
+        event.preventDefault();
+        handleInput('equals');
+      } else if (key === 'Backspace') {
+        handleInput('delete');
+      } else if (key === 'Escape') {
+        handleInput('clear');
+      } else if (key.toLowerCase() === 's') {
+        handleInput('function', 'sin(');
+      } else if (key.toLowerCase() === 'c') {
+        handleInput('function', 'cos(');
+      } else if (key.toLowerCase() === 't') {
+        handleInput('function', 'tan(');
+      } else if (key.toLowerCase() === 'l') {
+        handleInput('function', 'ln(');
+      } else if (key.toLowerCase() === 'g') {
+        handleInput('function', 'log(');
+      } else if (key.toLowerCase() === 'r') {
+        handleInput('function', 'sqrt(');
+      } else if (key.toLowerCase() === 'p') {
+        handleInput('function', 'pi');
+      }
+    });
+
+    updateDisplay();
+  </script>
+</body>
+</html>
